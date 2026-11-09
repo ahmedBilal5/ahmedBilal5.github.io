@@ -71,7 +71,7 @@ const NavBar = () => {
       >
         <div className="max-w-sections mx-auto flex flex-row items-center justify-between gap-8 px-4 md:px-8">
           <Link href="/" className="flex items-center gap-2 text-lg font-extrabold tracking-tight hover:text-red-500 transition-colors">
-            <BrandMark className="h-8 w-8" />
+            <BrandMark className="h-10 w-10 -my-1" />
             Ahmed Bilal
           </Link>
           <ul className="hidden md:flex md:flex-row md:items-center md:space-x-6">

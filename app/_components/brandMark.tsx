@@ -1,21 +1,21 @@
-// "AB" with an underline, rotated -45°, in a circle. Same design as app/icon.svg.
+// "AB" with an underline, rotated -45°. Same design as app/icon.svg.
 export default function BrandMark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" aria-hidden="true" className={className}>
-      <circle cx="32" cy="32" r="32" className="fill-slate-800 dark:fill-slate-200" />
       <g transform="rotate(-45 32 32)">
         <text
           x="32"
-          y="38"
+          y="40"
           textAnchor="middle"
           fontFamily="Helvetica, Arial, sans-serif"
           fontWeight="700"
-          fontSize="24"
-          className="fill-slate-50 dark:fill-slate-800"
+          fontSize="30"
+          letterSpacing="-0.5"
+          className="fill-slate-800 dark:fill-slate-100"
         >
           AB
         </text>
-        <rect x="17" y="42" width="30" height="3.5" rx="1.75" className="fill-red-400 dark:fill-red-600" />
+        <rect x="13" y="45" width="38" height="4.5" rx="2.25" className="fill-red-500 dark:fill-red-400" />
       </g>
     </svg>
   );

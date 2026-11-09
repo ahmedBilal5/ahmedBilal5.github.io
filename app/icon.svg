@@ -1,7 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="32" fill="#1e293b"/>
+  <style>
+    .t { fill: #1e293b } .u { fill: #ef4444 }
+    @media (prefers-color-scheme: dark) { .t { fill: #f1f5f9 } .u { fill: #f87171 } }
+  </style>
   <g transform="rotate(-45 32 32)">
-    <text x="32" y="38" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="24" fill="#f8fafc">AB</text>
-    <rect x="17" y="42" width="30" height="3.5" rx="1.75" fill="#f87171"/>
+    <text class="t" x="32" y="40" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="30" letter-spacing="-0.5">AB</text>
+    <rect class="u" x="13" y="45" width="38" height="4.5" rx="2.25"/>
   </g>
 </svg>

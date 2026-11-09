@@ -1,29 +1,27 @@
 export const metadata = {
   title: "Implementing debounce functionality in React",
-  featuredImage: "../images/codeOnScreen.png",
-  publishDate: "2026-05-20",
-  lastModified: "2026-05-20",
-  excerpt: "Implementing a React Hook that does different asynchronous operation at debounced intervals on a UI interaction",
+  featuredImage: "/images/codeOnScreen.webp",
+  publishDate: "2026-07-25",
+  lastModified: "2026-07-25",
+  excerpt: "Walking through a real React hook that debounces API calls triggered by UI changes, and the four requirements it has to meet.",
   tags: ["React", "Hooks", "Autosave", "Redux"],
   type: 'blog',
   featured: true
 };
 
-![Lodash Debounce Function](../images/codeOnScreen.png)
+![Lodash debounce function signature on a monitor](/images/codeOnScreen.webp)
 > Disclaimer: Parts of this blog were written with the assistance of an AI agent.
 
-Assalam u Alaikum. In this article, we will discuss debouncing. Debouncing is a well-known technique in UI development. According to copilot:
+Assalam u Alaikum. In this article, we will discuss debouncing. Debouncing is a well-known technique in UI development: it makes sure a function runs only once after a burst of rapid triggers, instead of on every one of them.
 
-> Debounce refers to a technique that ensures a function or signal is executed only once after a series of rapid triggers, preventing unnecessary repeated actions.
-
-I will walk through an actual hook I implemented for a project that basically was responsible for triggering some API calls based on the changes made on the UI. As you can guess, that a series of changes should only trigger a single api call (after a substantial interval has passed from the last time the user changed anything on the UI) and any changes that cancel out themselves should not trigger a call.
-This hook covers many different aspects of and requirements for debouncing, so I thought it would be a good example to write about.
+I will walk through a hook I wrote for a project that triggers API calls based on changes made in the UI. A burst of changes should trigger only a single API call, once enough time has passed since the user's last change, and changes that cancel each other out should not trigger a call at all.
+The hook covers many aspects of debouncing, which makes it a good example to write about.
 Here is the full hook for your review: [useObjectsExternalSync.ts](https://gist.github.com/ahmedBilal5/cd314c309e1e3064625dd5983d456e60)
 
 
 ---
 
-### The Context
+## The Context
 
 The hook — `useObjectsExternalSync` — keeps a backend subscription in sync with what a user is building in a UI mapping (matching) editor. The user can:
 
@@ -34,7 +32,7 @@ Each of these changes should eventually trigger a GraphQL mutation (`upsert` or 
 
 ---
 
-### Requirement 1 — Stable Debounced Function References (`useMemo`)
+## Requirement 1 — Stable Debounced Function References (`useMemo`)
 
 ```typescript
 const debouncedUpsertDataflowSubscription = useMemo(() => debounce(
@@ -46,15 +44,15 @@ const debouncedDeleteDataflowSubscriptionFunction = useMemo(() => debounce(
 ), []);
 ```
 
-#### Why this matters
+### Why this matters
 
 `lodash.debounce` returns a *new function object* every time it is called. A debounced function carries internal state: the pending timer ID and the arguments from the most recent call. If you recreate the debounced function on every render, you throw away that timer on every render. This will cause buggy behaviour.
 
-#### The fix: `useMemo` with an empty dependency array
+### The fix: `useMemo` with an empty dependency array
 
 `useMemo(() => debounce(fn, 3000), [])` runs exactly once per component lifetime and hands back the same debounced function object on every subsequent render. The timer state is preserved across renders.
 
-#### The subtle trap: `useCallback` on the inner function first
+### The subtle trap: `useCallback` on the inner function first
 
 Notice that `UpsertDataflowSubscription` is itself wrapped in `useCallback` before being handed to `debounce`:
 
@@ -66,11 +64,11 @@ const UpsertDataflowSubscription = useCallback(
   [upsertDataflowSubscription]
 );
 ```
-This is just because this function does not need to be created on every render, as it otherwise would if not wrapped in useCallback. Although it doesn't matter too much, only an optimization.
+This simply stops the function from being recreated on every render. It is a minor optimization rather than a requirement.
 
 ---
 
-### Requirement 2 — Cancellation on Cleanup
+## Requirement 2 — Cancellation on Cleanup
 
 ```typescript
 useEffect(() => {
@@ -83,11 +81,11 @@ useEffect(() => {
 }, [/* deps */]);
 ```
 
-#### Why this matters
+### Why this matters
 
 When a React component unmounts — or when a `useEffect` re-runs because its dependencies changed — any pending debounced call is now "orphaned." If it fires after unmount it will attempt to reference state from the old render cycle (stale closure). This is a bug.
 
-#### The fix: `.cancel()` in the cleanup function
+### The fix: `.cancel()` in the cleanup function
 
 `lodash.debounce` exposes a `.cancel()` method that clears the pending timer. Calling it in the `useEffect` cleanup function means: whenever this effect is about to re-run *or* the component unmounts, discard any old queued-but-not-yet-fired calls.
 
@@ -96,7 +94,7 @@ When a React component unmounts — or when a `useEffect` re-runs because its de
 
 ---
 
-### Requirement 3 — Force Flushing (Bypassing the Delay)
+## Requirement 3 — Force Flushing (Bypassing the Delay)
 
 ```typescript
 const forceUpdate = useCallback(() => {
@@ -112,27 +110,27 @@ const forceUpdate = useCallback(() => {
 return { forceUpdate };
 ```
 
-#### Why this matters
+### Why this matters
 
 Debouncing introduces deliberate latency. That latency is appropriate for rapid-fire user input but catastrophic when the user explicitly commits their work — for example, clicking a "Save" button, navigating away, or submitting a form. In those moments you need the pending call to fire *immediately*, not 3 seconds later.
 
-#### The fix: `.flush()`
+### The fix: `.flush()`
 
 `lodash.debounce` exposes a `.flush()` method that immediately invokes the pending call with the last-seen arguments and cancels the timer. The hook surfaces this as a `forceUpdate` function that callers can invoke at commit time.
 
-#### The design implication
+### The design implication
 
 So here we have two different cases:
 
-- The **useEffect** basically calls the debounced functions after a specified delay based on state changes (state that changes on user input).
-- The **forceUpdate** method exposed from the hook, called in the parent when an instant 'save' is required, such as on navigating away from the page.
+- The **useEffect** calls the debounced functions after a delay whenever the relevant state changes (state that changes on user input).
+- The **forceUpdate** method, exposed by the hook, is called by the parent when an instant save is needed, such as when navigating away from the page.
 
 
-> **General Rule:** Expose a `flush` based method for imperative "save now" scenarios.
+> **General Rule:** Expose a `flush`-based method for imperative "save now" scenarios.
 
 ---
 
-### Requirement 4 — Deep Equality in the Dependency Array
+## Requirement 4 — Deep Equality in the Dependency Array
 
 ```typescript
 useEffect(() => {
@@ -148,13 +146,13 @@ useEffect(() => {
 ]);
 ```
 
-#### Why this matters
+### Why this matters
 
 `uniqueDataObjectIds` is an array computed by `useMemo`. Even if the array contents are identical between renders, JavaScript reference equality (`===`) will return `false` for two separately created arrays. Without deep comparison, the `useEffect` would re-run (and queue a debounced call) every time any dependency changes, even if the IDs themselves are unchanged.
 
 ---
 
-### Putting It All Together
+## Putting It All Together
 
 Here is a mental model of how this all works:
 
@@ -188,11 +186,11 @@ useEffect re-runs / component unmounts
 
 ---
 
-### Summary
+## Summary
 
-- [ ] Wrap `debounce(...)` in `useMemo` with a stable dependency array (usually `[]`)
-- [ ] Wrap the inner function in `useCallback` before passing it to `debounce`
-- [ ] Call `.cancel()` in the `useEffect` cleanup function
-- [ ] Expose `.flush()` as an escape hatch for imperative "commit now" calls
-- [ ] Use deep comparison (`JSON.stringify` or equivalent) for array/object dependencies
+- Wrap `debounce(...)` in `useMemo` with a stable dependency array (usually `[]`)
+- Wrap the inner function in `useCallback` before passing it to `debounce`
+- Call `.cancel()` in the `useEffect` cleanup function
+- Expose `.flush()` as an escape hatch for imperative "commit now" calls
+- Use deep comparison (`JSON.stringify` or equivalent) for array/object dependencies
 

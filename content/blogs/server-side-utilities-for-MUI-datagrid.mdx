@@ -1,17 +1,17 @@
 export const metadata = {
-  title: "Server Side utilities for MUI data-grid",
-  publishDate: "2026-05-20",
-  lastModified: "2026-05-20",
-  excerpt: "A comparison of two utility classes that enable backend integration with the frontend MUI data-grid for server-side data",
-  tags: ["typescript", "mui", "data-grid", "server-side", "sql"],
+  title: "Server-side utilities for the MUI data-grid",
+  publishDate: "2026-06-25",
+  lastModified: "2026-06-28",
+  excerpt: "Comparing two backend utility classes for the MUI data-grid's server-side mode: one filters in memory, the other builds the SQL query.",
+  tags: ["TypeScript", "MUI", "data-grid", "server-side", "SQL"],
   type: 'blog',
   featured: true
 };
 
-![Visual illustration of server-side utils for data-grids](../images/serverSideUtils.png)
-While I was replacing MUI `data-grid`s with server side lazy loaded `data-grid`s across a project at work, It quickly became obvious that I would need the appropriate functionality on the server-side to handle the data-grids filter, sort and pagination model, not to mention, start and end parameters for server-side lazy loading and group Keys for server side tree data.
+![Visual illustration of server-side utils for data-grids](/images/serverSideUtils.webp)
+While replacing MUI `data-grid`s with server-side, lazy-loaded `data-grid`s across a project at work, it quickly became obvious that I would need matching functionality on the server to handle the data-grid's filter, sort and pagination models, as well as the start and end parameters for lazy loading and the group keys for server-side tree data.
 
-The first instance of this functionality that I wrote was a class that performed all the work in memory at run-time. Here it is:
+My first version was a class that did all the work in memory at runtime. Here it is:
 
 > NOTE: For brevity, I will not paste the whole implementation but just the core function of each class. Full implementations are linked at the bottom.
 ```typescript
@@ -68,9 +68,9 @@ export class DataGridUtils {
   }
 }
 ```
-The class above in totality contains all the methods for filtering, sorting, and all of the other data-grid configuration mentioned previously. The upside of this pure typescript implementation is that it can be flexibly be used regardless of what the data source is, since all the operations are happening in memory. The downside, and a major one, is that it requires the full set of data to be loaded into memory first, which sort of defeats the purpose of lazy-loading. This problem is exacerbated by the fact that the full set of data needs to be fetched on the server for each paginated/lazy loaded call to the server, which can be a lot. However, this class can be used conveniently when the volume of data is not massive.
+The full class contains all the methods for filtering, sorting, and all of the other data-grid configuration mentioned previously. The upside of this pure TypeScript implementation is that it works regardless of the data source, since all the operations are happening in memory. The downside, and a major one, is that it requires the full set of data to be loaded into memory first, which largely defeats the purpose of lazy loading. Worse, the full data set has to be fetched on the server for every paginated or lazy-loaded request, which can be a lot. However, this class can be used conveniently when the volume of data is not massive.
 
-Increasing volume of data in my project eventually led me to create a new implementation altogether in light of the drawback discussed: An implementation that does all the operations at the data source level, instead of memory. Since my data source was a Postgres relational database, the new implementation generates a sophisticated SQL query to select data from the database. I have leveraged the typeORM SelectQueryBuilder for much of this. Here is the new implementation:
+As the volume of data in my project grew, this drawback led me to write a new implementation altogether: one that does all the operations at the data source level, instead of memory. Since my data source was a Postgres relational database, the new implementation generates a sophisticated SQL query to select data from the database. I used TypeORM's `SelectQueryBuilder` for much of this. Here is the new implementation:
 ```typescript
 @Injectable()
 export class DatagridQueryService {
@@ -162,13 +162,13 @@ export class DatagridQueryService {
     return qb;
   }
 ``` 
-This class delivers perfectly correct results, just as the previous class. However, it eliminates the problem of fetching everything into memory first, and instead will generate a query which will fetch the final set of results right from the source. This is a major improvement. However, it has been tested to work only with a Postgres database table.
+This class returns exactly the same results as the previous one, but instead of loading everything into memory first, it generates a query that fetches the final results straight from the source. That is a major improvement. Note that it has only been tested with Postgres tables.
 
 ### To Summarize
 
   <figure style={{ textAlign: "center" }}>
   <img
-    src="../images/serverSideUtilsComparision.png"
+    src="/images/serverSideUtilsComparision.webp"
     alt="Both server side approaches described"
   />
   
@@ -184,7 +184,7 @@ This class delivers perfectly correct results, just as the previous class. Howev
 
 - Flexible to use
 
-- Plain Typescript; easier to extend and refactor
+- Plain TypeScript; easier to extend and refactor
   
 
 ***Cons***
@@ -199,16 +199,16 @@ This class delivers perfectly correct results, just as the previous class. Howev
 
 ***Pros***
 
-- Fetches filtered data right from source as lazy loading should be ideally
+- Fetches filtered data straight from the source, as lazy loading ideally should
 
 ***Cons***
 
-- Requires a data source specific implementation; in my case SQL (Postgres)
+- Requires a data-source-specific implementation; in my case SQL (Postgres)
 
 - Harder to write and extend
 ---
 
-Keeping everything in view, the second implementation must be considered to be the better one since it shifts the filtering operations to the data source level and thus, keeps the point of paginated loading alive.
+All things considered, the second implementation is the better one: it moves filtering to the data source and so keeps the benefit of paginated loading.
 
 I have focused this article on discussing the two approaches at a high level with respect to their pros and cons and have not dissected the implementations I attached. That is something I will leave up to you, the reader! 
 
@@ -221,7 +221,7 @@ Approach 2:
 <a href="https://gist.github.com/ahmedBilal5/7a183dd8d45feb2c0805650d95224425" target="_blank">SQL Processing</a> 
 
 
-Hope this was a useful read. 
+I hope this was a useful read.
 
 
 

@@ -4,7 +4,12 @@ import createMDX from '@next/mdx'
 const nextConfig = {
   // Configure `pageExtensions` to include markdown and MDX files
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
-  // Optionally, add any other Next.js config below
+  // Build plain HTML into out/ so the site can be hosted on GitHub Pages
+  output: 'export',
+  // GitHub Pages has no image server, so serve images as-is
+  images: { unoptimized: true },
+  // Emit works/index.html etc., which every static host resolves cleanly
+  trailingSlash: true,
 }
  
 const withMDX = createMDX({

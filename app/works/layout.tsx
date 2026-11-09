@@ -1,9 +1,5 @@
 import { ReactNode } from "react";
 
 export default function WorksLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="md:max-w-[80%] mx-auto flex flex-col min-h-screen">
-      {children}
-    </div>
-  );
+  return <div className="md:max-w-[80%] w-full mx-auto flex flex-col">{children}</div>;
 }

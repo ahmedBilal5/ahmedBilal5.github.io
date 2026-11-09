@@ -1,20 +1,19 @@
 export const metadata = {
-  title: "Using MUI data-grid to preview a custom expression language",
-  featuredImage: "path-to-image",
-  publishDate: "2026-05-20",
-  lastModified: "2026-05-20",
-  excerpt: "To show how MUI data-grid-pro can be used as a complex nested Expression Preview",
+  title: "Using the MUI data-grid to preview a custom expression language",
+  publishDate: "2026-05-10",
+  lastModified: "2026-06-13",
+  excerpt: "Turning the MUI data-grid-pro tree view into a live, expandable preview of nested expressions and their computed results.",
   tags: ["React", "MUI", "data-grid"],
   type: 'work',
   featured: true,
-  featuredImage: '../../images/previewbasic.png'
+  featuredImage: '/images/previewbasic.png'
 };
 
-Assalam u Alaikum Folks! The motivation for this blog is to show how the **MUI data-grid** React component can be used in a _unique_ use-case: To preview the results of nested expressions. Here is how it looks:
-![Basic Expression Preview Example](../images/expandcollapse.gif)
+Assalam u Alaikum Folks! The motivation for this blog is to show how the **MUI data-grid** React component can be used in an _unusual_ way: to preview the results of nested expressions. Here is how it looks:
+![Basic Expression Preview Example](/images/expandcollapse.gif)
 
 ## 1. Type Definitions
- First thing that we need are type definitions for our expression language. These can, of course, be quite comprehensive depending on how complex our language is. A short sample of the types for my language in typescript:
+ The first thing we need is type definitions for our expression language. These can, of course, be quite comprehensive depending on how complex our language is. A short sample of the types for my language in TypeScript:
  ```ts
 export type Switch = {
   Expression: SwitchExpressionBlock;
@@ -61,7 +60,7 @@ export type Expression = {
  ```
  This is just a subset of all the types to get the main idea across. Note that we will be using the data-grid only to **display** the expression and its computed results at each level, not **build** the expression. Building is done separately using an expression builder component which is out of the scope of our topic.
  ## 2. Setting up the data-grid
- First lets set up a simple data-grid:
+ First, let's set up a simple data-grid:
  ```ts
  const FunctionTree = ({ open }: { open: boolean }) => {
  
@@ -108,16 +107,16 @@ export type Expression = {
   );
 };
  ```
- This much is simple. Note the: 
+ This much is simple. Note the following:
  ```typescript
  getTreeDataPath={(row: PreviewFunctionTreeType) =>
         row?.treePath?.split('/')
       }
  ```
- This is because we will be building our tree path rows separated by `/`. For example, for a parameter inside the  `split`  function inside a `concat` function, the tree path will look like `concat-1/split-1/attr1`.
- Next, we be adding the API to fetch the right-hand side computed values for our expressions at each level. 
+ This is because we will be building our tree path rows separated by `/`. For example, for a parameter inside the `split` function inside a `concat` function, the tree path will look like `concat-1/split-1/attr1`.
+ Next, we will add the API call to fetch the right-hand side computed values for our expressions at each level. 
  ## 3. Adding API call to get expression results
-For the above, we are using [Web Assembly](https://webassembly.org/) to run the expression logic inside the browser and give us back the computed results. Here is our updated component with the API logic:
+For this, we are using [WebAssembly](https://webassembly.org/) to run the expression logic inside the browser and give us back the computed results. Here is our updated component with the API logic:
  
 ```ts
 const FunctionTree = ({ open }: { open: boolean }) => {
@@ -394,11 +393,11 @@ const FunctionTree = ({ open }: { open: boolean }) => {
 };
 ```
 The above logic will construct the tree paths for us:
-![Tree Paths logged](../images/treepaths.png)
+![Tree Paths logged](/images/treepaths.png)
 
 But we also need logic for what to display in each row of the tree. 
 
-We have defined the following types of tokens that we will be catering:
+We have defined the following token types to cater for:
 
 ```typescript
 //For Mapping Preview
@@ -422,9 +421,9 @@ ELSECONDITION  =  'elseCondition',
 
 > Remember that each row, when collapsed, will show the whole expression (in a compressed form) that is formed down its tree. But when we expand a row, it only shows the token at its current tree path, be that a function, attribute, bracket or any other.
 
-![Expression expanded and Collapsed](../images/expandcollapse.gif)
+![Expression expanded and Collapsed](/images/expandcollapse.gif)
 
-Therefore, aside from creating the tree path hierarchy for the data-grid, we also need a way to calculate what we display on each row, when collapsed and when expanded.  For that, we will add a second capability to our hook `useConstructFunctionTree`, that is, computing the token chain for each row. Here is the main function for that:
+Therefore, aside from creating the tree path hierarchy for the data-grid, we also need a way to calculate what each row displays when collapsed and when expanded. For that, we will add a second capability to our hook `useConstructFunctionTree`, that is, computing the token chain for each row. Here is the main function for that:
 ```typescript
  /**
      Function to construct array of tokens for mapping preview
@@ -514,7 +513,7 @@ Therefore, aside from creating the tree path hierarchy for the data-grid, we als
 ```
 You can get an idea just from the function above how we are using the same recursive approach we used to construct the tree here as well. Exactly what we do in each subfunction is not hard to guess once you get the big picture.
 
-Now we are approaching the main part of this project. That is, how do we leverage the data-grid component to show the expressions. The `renderCell` method of the data-grids `groupingColDef` allows you to render any JSX inside a cell. That is key for our use case. So, we will first make small components for each token type to render inside cells. For brevity, I have included only 2 such components:
+Now we are approaching the main part of this project. That is, how do we leverage the data-grid component to show the expressions. The `renderCell` method of the data-grid's `groupingColDef` allows you to render any JSX inside a cell. That is key for our use case. So, we will first make small components for each token type to render inside cells. For brevity, I have included only 2 such components:
 
 ```typescript
 export const FunctionToken = ({ label, showIcon }: FunctionTokenProps) => {
@@ -709,7 +708,7 @@ export const FunctionTreeTokenChain = ({
   );
 };
 ```
-Hopefully, this all makes sense till now. Next,  we need to pass the required *token array* to our token chain component inside the ```renderCell``` method. For that, we will make use of the ```constructTokenArray``` function we exposed from our hook:
+Hopefully, this all makes sense so far. Next, we need to pass the required *token array* to our token chain component inside the ```renderCell``` method. For that, we will make use of the ```constructTokenArray``` function we exposed from our hook:
 
 ```typescript
 const { constructTree: constructFunctionTree, constructTokenArray } = useConstructFunctionTree();
@@ -728,7 +727,7 @@ const groupingColDef: DataGridProProps['groupingColDef'] = {
     }, 
   }
 ```
-There is a small complication, however. When we use the ```renderCell``` prop to render the cell, we have to completely define ourselves what is to be rendered in an empty cell. This means that for ```tree Data```, the expansion and collapse button that appears by default in grouping column cells, will also not be present when we use ```renderCell```. You can read more about this in [this github issue](https://github.com/mui/mui-x/issues/13400#issuecomment-2154388702). Luckily, there is a workaround for this issue, which is to render a custom grouping column cell rendering our own expand and collapse button. So that is exactly what we will do:
+There is a small complication, however. When we use the ```renderCell``` prop to render the cell, we have to define everything that is rendered in the cell ourselves. This means that for tree data, the expand and collapse button that appears by default in grouping column cells will not be present when we use ```renderCell```. You can read more about this in [this GitHub issue](https://github.com/mui/mui-x/issues/13400#issuecomment-2154388702). Luckily, there is a workaround for this issue, which is to render a custom grouping cell with our own expand and collapse button. So that is exactly what we will do:
 ```typescript
 const FunctionTreeCustomGroupingColumnCell = ({
   params,
@@ -805,7 +804,7 @@ const groupingColDef: DataGridProProps['groupingColDef'] = {
     ),
   };
 ```
-And that is about it! There is some extra stuff, for example, rendering the custom arrow toggle buttons in the grid header, but I will just put the whole ```FunctionTree``` Component definition for you to see how everything is put together finally:
+And that is about it! There is some extra stuff, for example, rendering the custom arrow toggle buttons in the grid header, but I will just put the whole ```FunctionTree``` component definition for you to see how everything is put together finally:
 ```typescript
 const FunctionTree = ({ open }: { open: boolean }) => {
   const apiRef = useGridApiRef();
@@ -975,4 +974,4 @@ const FunctionTree = ({ open }: { open: boolean }) => {
   );
 ```
 Here is how the final component works in a [detailed example](https://jumpshare.com/share/ywJv4aqoTPlhw8BUoQzs).
-Hope this was an informative blog about how the ```data-grid-pro``` component of MUI can be customized for an advanced and unconventional use case. Until Next time. Allah Hafiz!
+I hope this was an informative look at how the ```data-grid-pro``` component of MUI can be customized for an advanced and unconventional use case. Until next time. Allah Hafiz!

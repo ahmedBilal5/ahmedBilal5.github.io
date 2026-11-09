@@ -1,0 +1,91 @@
+export const metadata = {
+  title: "Making my first contributions to open source",
+  publishDate: "2026-05-30",
+  lastModified: "2026-07-25",
+  excerpt: "How I found and reported five issues in the new server-side MUI X Data Grid v8, and the mindset it took to start.",
+  tags: ["React", "MUI", "data-grid", "open source", "GitHub"],
+  type: 'blog',
+  featured: true
+};
+
+
+<figure style={{ textAlign: "center" }}>
+  <img
+    src="/images/github-logo.webp"
+    alt="Github Logo"
+  />
+  <a
+    target="_blank"
+    href="https://brand.github.com/foundations/logo">
+  <figcaption >
+    Source: GitHub
+  </figcaption>
+  </a>
+</figure>
+
+This blog is about how I was able to make my first real contribution to open source by Allah's grace, followed by a few more. It is less about the contributions themselves, and more about the mindset it took me to finally make one. In particular, I was able to find and report some bugs/issues in the open-core MUI-X component `data-grid-pro`.
+
+It so happened that one of my projects at Zones was using MUI as part of its UI Kit. In addition to MUI components, which are free of cost to use, this project was also using two of the advanced MUI X components: the `x-data-grid-pro` and `x-date-picker`. In particular, the `x-data-grid-pro` was used heavily throughout the project to display large volumes of data.
+
+The `data-grid-pro`, however, was the default client-side version, which required all data to be fetched from the server and then displayed (*in truth, while it is possible to make an implementation with paginated data using the client-side grid, it has limitations*).
+
+I was tasked with finding a solution to this heavy pre-fetching of data which caused loading times for users on the order of minutes. Fortunately, MUI X had released version 8 a few months earlier, which introduced capabilities for server-side data, server-side tree data, and lazy-loading data. 
+
+The best course of action seemed to be to upgrade MUI to version 8 and then start replacing our grids with the new server-side grids one after another. One thing I did not foresee, however, was that the v8 `data-grid-pro` component *itself* would have bugs, serious enough to stop me from using it in our project.
+ 
+Looking at it in hindsight, it seems quite understandable that a newly launched set of advanced features in a complex UI component would have some unidentified issues. But at the time, it never crossed my mind. Perhaps because somewhere deep down, I assumed that a well-known and widely used library like MUI was surely free of any bugs.
+
+Fast-forward to the night I found the first issue. It was 2 a.m., and I was about to start a week of leave from work. So I was free of any immediate pressure and had been tinkering around with the server-side `data-grid-pro` in my project until I got stuck on a problem I was fairly sure was not in my hands. It struck me that I could confirm if this was a problem in the grid itself by forking a StackBlitz demo from the documentation and replicating my use-case there. On normal workdays, I would not have taken the trouble, but since I had holidays ahead, I was relaxed and decided to see where it led. I replicated my use case in StackBlitz and, Alhamdulillah, the issue reproduced.
+
+I immediately opened the GitHub issues page for MUI X, read the issue creation guidelines and began to create an issue. It took me about 20 minutes to write it all down. I proofread it twice and pressed submit. At the time, it was just an interesting first-time exercise.
+ 
+I was surprised and glad when the issue was readily acknowledged by the MUI team in less than a week's time. That was a big confidence booster and a relief in the sense that any future problems I faced that felt out of my hands could be reported and would get real feedback. Previously, I had assumed that if I found an issue in a library or package, I would have no choice but to find a workaround. Fortunately, MUI guarantees support to its pro customers, so that was not the case here.
+
+Since then, I have reported four more issues (five in total) on the same component while continuing the server integration work. Four of the five were confirmed as bugs and fixed. Below is an AI-generated summary of each issue:
+
+## Issues Reported in MUI DataGrid Pro
+
+### 1. `params.groupKeys` Becomes Undefined After Data Source Re-computation
+
+**Issue #21006**
+
+While working with server-side tree data, I discovered that when a memoized data source is re-created, the `params.groupKeys` value passed to `getRows()` becomes `undefined`. This breaks row fetching logic for expanded tree nodes and makes data source re-computation unreliable.
+
+🔗 https://github.com/mui/mui-x/issues/21006
+
+
+### 2. Incorrect Sibling Uniqueness Validation for Tree Data
+
+**Issue #21263**
+
+I reported a bug where DataGrid Pro throws the error *"values returned by `getGroupKey` for all the sibling rows should be unique"* even when duplicate keys exist on rows that are not siblings. The validation incorrectly treats non-sibling rows as siblings.
+
+🔗 https://github.com/mui/mui-x/issues/21263
+
+### 3. `getRowId` Does Not Work with Server-Side Tree Data
+
+**Issue #21357**
+
+This issue highlights that the `getRowId` prop is ignored when using server-side tree data. As a result, applications that rely on custom row identifiers cannot properly integrate with the tree data feature.
+
+🔗 https://github.com/mui/mui-x/issues/21357
+
+### 4. `fetchRows()` API Not Working in Lazy Loading Mode
+
+**Issue #21722**
+
+I found that the `fetchRows()` API does not behave as expected when DataGrid Pro is configured for lazy loading. The method fails to trigger row retrieval, limiting its usefulness for on-demand data fetching scenarios.
+
+🔗 https://github.com/mui/mui-x/issues/21722
+
+### 5. Clearing Stale Rows with Active Filtering/Sorting in Server-Side Tree Data
+
+**Issue #21755**
+
+This issue investigates how to properly clear previously loaded rows when `filterModel` or `sortModel` changes while using server-side tree data. Without clearing stale data, the grid can temporarily display outdated rows during refreshes.
+
+🔗 https://github.com/mui/mui-x/issues/21755
+
+
+### The Verdict
+There is no verdict! Just this: never give up on finding a solution too early. Keep trying and a way always opens by Allah's grace.

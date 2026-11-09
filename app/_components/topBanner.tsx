@@ -29,7 +29,7 @@ export const TopBanner = ({
                 src={flagSrc}
                 alt="Palestinian flag"
                 className="h-3.5 w-6 shrink-0 rounded-[2px] ring-1 ring-black/20 dark:ring-white/20"
-                loading="lazy"
+
               />
               <span>{text}</span>
             </a>
@@ -39,7 +39,7 @@ export const TopBanner = ({
                 src={flagSrc}
                 alt="Palestinian flag"
                 className="h-3.5 w-6 shrink-0 rounded-[2px] ring-1 ring-black/20 dark:ring-white/20"
-                loading="lazy"
+
               />
               <span>{text}</span>
             </div>

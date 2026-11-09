@@ -1,13 +1,12 @@
 export const metadata = {
-  title: "NPM package to read the change-feed from an Azure Storage Account",
-  featuredImage: "path-to-image",
-  publishDate: "2026-05-20",
-  lastModified: "2026-05-20",
-  excerpt: "A working substitute for the buggy @azure/blob-changefeed package for anyone who happens to have storage provisioned on azure and needs to read the change-feed.",
-  tags: ["npm", "typescript", "azure", "change-feed"],
+  title: "An npm package for reading the Azure Blob Storage change feed",
+  publishDate: "2026-05-30",
+  lastModified: "2026-06-28",
+  excerpt: "A working replacement for the unmaintained @azure/storage-blob-changefeed package, published on npm, for anyone who needs to read an Azure storage account's change feed.",
+  tags: ["npm", "TypeScript", "Azure", "change feed"],
   type: 'work',
   featured: true,
-  featuredImage: '../../images/npmlogo.png'
+  featuredImage: '/images/npmlogo.png'
 };
 
 
@@ -25,7 +24,7 @@ export const metadata = {
   </a>
 </figure>
 
-For one of my projects at my organization Zones, I needed to implement an intelligent way to synchronize our systems local cache with the data on a Microsoft Azure Storage Account.
+For one of my projects at Zones, I needed an efficient way to synchronize our system's local cache with the data on a Microsoft Azure Storage Account.
 
 I looked up ways and came across the [Azure Event Grid](https://learn.microsoft.com/en-us/azure/event-grid/overview) and the [Azure Storage Blob Changefeed](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-change-feed?tabs=azure-portal). 
 
@@ -33,13 +32,13 @@ Here is how the Azure documentation describes the Event Grid:
 
 > Azure Event Grid is a highly scalable and fully managed publish-subscribe service for message distribution
 
-Basically, it means reacting to real time events happening on Azure and sending them to a consumer/subscriber service.
+In other words, it reacts to real-time events happening on Azure and sending them to a consumer/subscriber service.
 
 And here is how the Azure documentation describes the Azure Storage Blob Change feed:
 
 > The purpose of the change feed is to provide transaction logs of all the changes that occur to the blobs and the blob metadata in your storage account. The change feed provides **ordered**, **guaranteed**, **durable**, **immutable**, **read-only** logs of these changes. Client applications can read these logs at any time, either in streaming or in batch mode.
 
-The change feed seemed perfect for my use-case as I required to synchronize changes happening to data in my storage account in Azure with my local cache. It also came at much less of a cost, and so It seemed the right option and I went along with it.
+The change feed seemed perfect for my use case, since I needed to sync changes in my Azure storage account with my local cache. It was also much cheaper, so I went with it.
 
 <figure style={{ textAlign: "center" }}>
   <img
@@ -55,20 +54,20 @@ The change feed seemed perfect for my use-case as I required to synchronize chan
   </a>
 </figure>
 
-So after generating a DevOps support request to enable the change-feed setting on the storage account, my next step was to look for the [Azure SDK](https://learn.microsoft.com/en-us/azure/developer/) library that I would use to read and process the change feed in my application. I found the [package](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/storage/storage-blob-changefeed) Azure had created as part of their Javascript SDK. Unfortunately, however, upon installing and using the package, I was met with an error while reading the changefeed. I reported [this issue](https://github.com/Azure/azure-sdk-for-js/issues/38184) on github, and got to know that the package I was trying to use has been in preview mode for several years and was not being supported.
+After raising a DevOps support request to enable the change-feed setting on the storage account, my next step was to look for the [Azure SDK](https://learn.microsoft.com/en-us/azure/developer/) library that I would use to read and process the change feed in my application. I found the [package](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/storage/storage-blob-changefeed) Azure had created as part of its JavaScript SDK. Unfortunately, however, upon installing and using the package, I hit an error while reading the change feed. I reported [this issue](https://github.com/Azure/azure-sdk-for-js/issues/38184) on GitHub and learned that the package had been in preview for several years and was no longer supported.
 
-This was an unexpected setback for me and introduced a whole new piece of work: finding another package for this purpose or writing my own. At first, I did not think that writing my own package would be an achievable task. However, upon going through the Azure docs, I discovered that the changefeed was published/stored in a special container called **$$blobchangefeed** inside the same storage account and was stored in a well known [Apache Avro](https://avro.apache.org/) format, as described on their website:
+This was an unexpected setback for me and introduced a whole new piece of work: finding another package for this purpose or writing my own. At first, I did not think that writing my own package would be an achievable task. However, upon going through the Azure docs, I discovered that the change feed is stored in a special container called **$blobchangefeed** inside the same storage account, in the well-known [Apache Avro](https://avro.apache.org/) format, as described on their website:
 
-> BlockquoteApache Avro™ is the leading serialization format for record data, and first choice for streaming data pipelines
+> Apache Avro™ is the leading serialization format for record data, and first choice for streaming data pipelines
 
-Praise be to Allah! That was enough to give me confidence to write my own implementation, even though I was having to go out of my way to cover for this unexpected setback. With the help of Claude Code, I was able to write my own typescript-based implementation with I made public on github and which I published on npm.
+Praise be to Allah! That was enough to give me confidence to write my own implementation, even though it meant going out of my way to cover this setback. With the help of Claude Code, I wrote my own TypeScript implementation, which I made public on GitHub and published on npm.
 
-Below is the:
+Here are the:
 
- - [github Repo](https://github.com/ahmedBilal5/simple-azure-blob-changefeed-reader)
+ - [GitHub repo](https://github.com/ahmedBilal5/simple-azure-blob-changefeed-reader)
  - [npm package](https://www.npmjs.com/package/simple-azure-blob-changefeed-reader)
  
- As an endnote to this blog, I am also including all the details included in the README of the package. 
+ As an endnote, here is the package's full README.
 
 -----
 > NOTE: This package was created with heavy usage of Claude Code. While the information below has been checked for correctness, read and use with due caution.  
@@ -79,7 +78,7 @@ A lightweight TypeScript library and CLI that reads the **Azure Blob Storage Cha
 
 ## Why This Package?
 
-The official `@azure/storage-blob-changefeed` SDK package is in preview and was throwing runtime errors in practice. This library is an alternative to that library.
+The official `@azure/storage-blob-changefeed` SDK package is in preview and was throwing runtime errors in practice. This library is an alternative to it.
 
 ## How Azure Blob Change Feed Works
 
@@ -200,7 +199,7 @@ createClientFromDefaultCredential(accountName)
 
 The storage account's service principal needs the **Storage Blob Data Reader** role on the `$blobchangefeed` container (or the account).
 
-> Note that Auth Options B and C, while supported, have not been tested in practice and may or may not work. Option A has been tested
+> Note that Auth Options B and C, while supported, have not been tested in practice and may not work. Option A has been tested.
 
 ## API Reference
 

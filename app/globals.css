@@ -71,3 +71,11 @@ body {
   display: block;
   overflow-x: auto;
 }
+
+/* Dracula comment colour is too faint to read (3:1); lift it to ~5:1 */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #9aa5ce !important;
+}

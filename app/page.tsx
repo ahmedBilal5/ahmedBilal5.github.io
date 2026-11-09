@@ -1,31 +1,24 @@
 import FeaturedWorks from "./_components/featuredWorks";
 import HeroSection from "./_components/hero";
-import RecentPosts from "./_components/recentPosts";
+import RecentPosts, { type Post as RecentPost } from "./_components/recentPosts";
 import ProfilePicture from "../public/images/profilePicture.jpeg";
 import { WorkCardProps } from "./_components/workCard";
-import { Post as RecentPost } from "./_components/recentPosts";
-import { getAllPosts } from "./blogs/_utils/getAllPosts";
+import { formatDate, getAllPosts } from "./_lib/posts";
 
 export default async function Portfolio() {
-  const experienceYears = new Date().getFullYear() - 2023;
-  const currentCompany = "Zones IT Solutions";
-
-  const heroHighlights = [
-    // { label: "TypeScript", iconSrc: "https://cdn.simpleicons.org/typescript" },
-    // { label: "React", iconSrc: "https://cdn.simpleicons.org/react" },
-    // { label: "GraphQL", iconSrc: "https://cdn.simpleicons.org/graphql" },
-    // { label: "NestJS", iconSrc: "https://cdn.simpleicons.org/nestjs" },
-    // { label: "Python", iconSrc: "https://cdn.simpleicons.org/python" },
-    // { label: "Git", iconSrc: "https://cdn.simpleicons.org/git" },
-  ];
+  const currentCompany = "Zones LLC";
+  // Placeholders: swap in the real URLs when the sites are live
+  const fabricUrl = "#";
+  const chaunsaLabsUrl = "#";
 
   const featuredBlogs = (await getAllPosts("blogs"))
-    .filter((blog) => blog?.featured)
+    .filter((blog) => blog.featured)
     .map(
       (blog): RecentPost => ({
         id: blog.slug,
         title: blog.title,
-        date: blog.publishDate,
+        date: formatDate(blog.publishDate),
+        dateTime: blog.publishDate,
         tags: blog.tags,
         description: blog.excerpt,
         href: `/blog/${blog.slug}`,
@@ -34,52 +27,55 @@ export default async function Portfolio() {
     );
 
   const featuredWorks = (await getAllPosts("works"))
-    .filter((work) => work?.featured)
+    .filter((work) => work.featured)
     .map(
       (work): WorkCardProps => ({
         title: work.title,
         description: work.excerpt,
         year: `${new Date(work.publishDate).getFullYear()}`,
         tags: work.tags,
-        imageUrl: work.featuredImage ?? "https://placehold.co/256x192",
+        imageUrl: work.featuredImage,
         href: `/work/${work.slug}`,
       }),
     );
 
   return (
-    <div className="md:mt-16.5 mt-7 flex-grow-1">
+    <div className="md:mt-16.5 mt-7 flex-grow">
       <HeroSection
         name="Ahmed"
         title="Software Engineer"
         description={
           <>
-            Engineer from Pakistan
-            with {experienceYears} years of software development experience across
-            Frontend, Backend and CI/CD. Currently working at{" "}
-            <a
-              href="https://www.linkedin.com/company/zones-it-solutions/posts/?feedView=all"
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-red-400 underline-offset-2 hover:text-red-500"
-            >
+            Computer Science graduate with distinction. UI Design System Lead at{" "}
+            <IntroLink href="https://www.linkedin.com/company/zones-it-solutions/posts/?feedView=all">
               {currentCompany}
-            </a>
-            . Looking to learn a bit about mobile app development. Would like
-            to build some tech that serves a good cause. Sometimes I blog about
-            tidbits from my work.
+            </IntroLink>
+            . Working on <IntroLink href={fabricUrl}>Fabric</IntroLink>, an
+            open-source design system built on MUI. Co-founding{" "}
+            <IntroLink href={chaunsaLabsUrl}>Chaunsa Labs</IntroLink>, a family
+            studio for learning apps and games. Interested in nutrition, sports, geopolitics, history, mysticism and meditation.
           </>
         }
-        highlights={heroHighlights}
         buttonText="Download Resume"
-        imageUrl={ProfilePicture.src}
+        image={ProfilePicture}
         buttonHref="/other/Ahmed Bilal Resume.pdf"
       />
       <RecentPosts posts={featuredBlogs} maxPosts={3} />
-      <FeaturedWorks
-        title={"Featured Works"}
-        maxWorks={4}
-        works={featuredWorks}
-      />
+      <FeaturedWorks title="Featured Works" maxWorks={4} works={featuredWorks} />
     </div>
+  );
+}
+
+// Underlined link used inside the intro paragraph. External links open in a new tab.
+function IntroLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const external = href.startsWith("http");
+  return (
+    <a
+      href={href}
+      {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+      className="underline decoration-red-400 underline-offset-2 hover:text-red-500"
+    >
+      {children}
+    </a>
   );
 }

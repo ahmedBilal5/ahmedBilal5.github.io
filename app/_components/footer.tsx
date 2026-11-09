@@ -1,4 +1,7 @@
+import { Caveat } from "next/font/google";
 import { contactEmail } from "../constants";
+
+const handwriting = Caveat({ subsets: ["latin"], weight: "600" });
 
 export interface Platform {
   name: string;
@@ -12,24 +15,45 @@ interface FooterProps {
   id?: string;
 }
 
+const iconLinkClass =
+  "inline-flex items-center justify-center p-1 rounded hover:bg-hover focus:outline-none focus-visible:ring-2";
+
+// Hand-drawn "Get in touch" note with a looping arrow that points at the email icon
+const GetInTouchNote = () => (
+  <span
+    aria-hidden="true"
+    className="pointer-events-none absolute right-full bottom-1/2 mr-0.5 flex flex-col items-end text-red-500 dark:text-red-400"
+  >
+    <span className={`${handwriting.className} -rotate-6 whitespace-nowrap text-lg sm:text-xl leading-none -mr-3 mb-0.5`}>
+      Get in touch
+    </span>
+    <svg viewBox="0 0 60 40" className="h-8 w-12 sm:h-10 sm:w-14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 3 C 4 14, 10 24, 20 22 C 28 20, 26 10, 19 13 C 12 16, 18 34, 44 36 L 54 36" />
+      <path d="M48 31 L 55 36 L 48 40" />
+    </svg>
+  </span>
+);
+
 const Footer = ({ platforms, className = "", id }: FooterProps) => {
   const year = new Date().getFullYear();
 
   return (
     <footer id={id} className={`py-4 md:py-6 my-15 sm:my-20 scroll-mt-20 ${className}`}>
       <div className="flex flex-col gap-4 items-center justify-center">
-        {contactEmail && (
-          <p className="text-center text-base sm:text-lg">
-            Get in touch:{" "}
-            <a
-              href={`mailto:${contactEmail}`}
-              className="font-medium underline decoration-red-400 underline-offset-4 hover:text-red-500"
-            >
-              {contactEmail}
-            </a>
-          </p>
-        )}
-        <div className="flex flex-row gap-4 items-center justify-center">
+        <div className="flex flex-row gap-4 items-center justify-center pt-8 max-[379px]:pl-8">
+          {contactEmail && (
+            <span className="relative">
+              <GetInTouchNote />
+              <a
+                href={`mailto:${contactEmail}`}
+                aria-label={`Email me at ${contactEmail}`}
+                title={contactEmail}
+                className={iconLinkClass}
+              >
+                <img src="/platforms/email-outlined.svg" alt="" className="dark:invert" />
+              </a>
+            </span>
+          )}
           {platforms.map((platform) => (
             <a
               key={platform.name}
@@ -38,7 +62,7 @@ const Footer = ({ platforms, className = "", id }: FooterProps) => {
               rel="noopener noreferrer"
               aria-label={platform.name}
               title={platform.name}
-              className="inline-flex items-center justify-center p-1 rounded hover:bg-hover focus:outline-none focus-visible:ring-2"
+              className={iconLinkClass}
             >
               <img src={platform.iconSrc} alt="" className="dark:invert" />
             </a>
